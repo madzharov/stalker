@@ -1,1 +1,1 @@
-# Stalker & Ministra Archives :)))
+# Stalker & Ministra Archives
