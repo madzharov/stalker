@@ -1,0 +1,232 @@
+diff --git a/.gitignore b/.gitignore
+index 9478c27..c88901f 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -6,4 +6,5 @@
+ /screenshots
+ /deploy/scripts
+ /misc/logos
+-/misc/audio_covers
+\ No newline at end of file
++/misc/audio_covers
++/server/custom.ini
+diff --git a/admin/resources/views/Events_index.twig b/admin/resources/views/Events_index.twig
+index 5994caa..66b6ed9 100644
+--- a/admin/resources/views/Events_index.twig
++++ b/admin/resources/views/Events_index.twig
+@@ -139,6 +139,9 @@
+                                             <option value="MAG255">MAG255</option>
+                                             <option value="MAG270">MAG270</option>
+                                             <option value="MAG275">MAG275</option>
++                                            <option value="MAG322">MAG322</option>
++                                            <option value="MAG324">MAG324</option>
++                                            <option value="MAG420">MAG420</option>
+                                             <option value="AuraHD0">AuraHD0</option>
+                                             <option value="AuraHD1">AuraHD1</option>
+                                             <option value="AuraHD9">AuraHD9</option>
+diff --git a/admin/resources/views/Settings_common.twig b/admin/resources/views/Settings_common.twig
+index 05f3259..11b7c4b 100644
+--- a/admin/resources/views/Settings_common.twig
++++ b/admin/resources/views/Settings_common.twig
+@@ -83,6 +83,9 @@
+                                             <option value="MAG270">MAG270</option>
+                                             <option value="MAG275">MAG275</option>
+                                             <option value="WR320">WR320</option>
++                                            <option value="MAG322">MAG322</option>
++                                            <option value="MAG324">MAG324</option>
++                                            <option value="MAG420">MAG420</option>
+                                             <option value="IP_STB_HD">IP_STB_HD</option>
+                                             <option value="AuraHD0">AuraHD0</option>
+                                             <option value="AuraHD1">AuraHD1</option>
+diff --git a/admin/resources/views/Users_users_list.twig b/admin/resources/views/Users_users_list.twig
+index bd65b39..a9a9864 100644
+--- a/admin/resources/views/Users_users_list.twig
++++ b/admin/resources/views/Users_users_list.twig
+@@ -134,6 +134,9 @@
+                                             <option value="MAG255">MAG255</option>
+                                             <option value="MAG270">MAG270</option>
+                                             <option value="MAG275">MAG275</option>
++                                            <option value="MAG322">MAG322</option>
++                                            <option value="MAG324">MAG324</option>
++                                            <option value="MAG420">MAG420</option>
+                                             <option value="AuraHD0">AuraHD0</option>
+                                             <option value="AuraHD1">AuraHD1</option>
+                                             <option value="AuraHD9">AuraHD9</option>
+diff --git a/admin/resources/views/basic_templates/events_menu.twig b/admin/resources/views/basic_templates/events_menu.twig
+index 2d58839..5b91ff9 100644
+--- a/admin/resources/views/basic_templates/events_menu.twig
++++ b/admin/resources/views/basic_templates/events_menu.twig
+@@ -71,6 +71,9 @@
+                                         <option value="MAG255">MAG255</option>
+                                         <option value="MAG270">MAG270</option>
+                                         <option value="MAG275">MAG275</option>
++                                        <option value="MAG322">MAG322</option>
++                                        <option value="MAG324">MAG324</option>
++                                        <option value="MAG420">MAG420</option>
+                                         <option value="AuraHD0">AuraHD0</option>
+                                         <option value="AuraHD1">AuraHD1</option>
+                                         <option value="AuraHD9">AuraHD9</option>
+diff --git a/c/xpcom.common.js b/c/xpcom.common.js
+index 49fcd0e..5c28060 100644
+--- a/c/xpcom.common.js
++++ b/c/xpcom.common.js
+@@ -990,7 +990,7 @@ function common_xpcom(){
+ 
+             _debug('checking conditions 2');
+ 
+-            if (this.num_banks == 2 && params.update_type == 'http_update'){
++            if ((this.num_banks == 2 || ['MAG322', 'MAG324', 'MAG420'].indexOf(this.type) >= 0 ) && params.update_type == 'http_update'){
+                 try{
+                     _debug('this.user[update_url]', this.user['update_url']);
+ 
+@@ -1050,7 +1050,7 @@ function common_xpcom(){
+             return;
+         }
+ 
+-        if (this.type != 'MAG200' && this.type != 'MAG260' && !_GET['debug_key']){
++        if (['MAG200', 'MAG245','MAG245D', 'MAG250', 'MAG254', 'MAG255', 'MAG270', 'MAG275', 'WR320', 'MAG322', 'MAG324', 'MAG420', 'IP_STB_HD'].indexOf(this.type) === -1 && !_GET['debug_key']){
+             var match = /Player Engine version: (\S+)/.exec(this.version);
+             _debug('match', match);
+ 
+@@ -1064,7 +1064,7 @@ function common_xpcom(){
+                 stb.loader.stop();
+                 this.cut_off(get_word('outdated_firmware'));
+ 
+-                if (['MAG200', 'MAG245','MAG245D', 'MAG250', 'MAG254', 'MAG255', 'MAG270', 'MAG275', 'WR320', 'IP_STB_HD'].indexOf(this.type) >= 0 || this.type.indexOf('AuraHD') != -1){
++                if (['MAG200', 'MAG245','MAG245D', 'MAG250', 'MAG254', 'MAG255', 'MAG270', 'MAG275', 'WR320', 'MAG322', 'MAG324', 'MAG420', 'IP_STB_HD'].indexOf(this.type) >= 0 || this.type.indexOf('AuraHD') != -1){
+                     this.check_image_version();
+                 }
+ 
+@@ -1152,7 +1152,7 @@ function common_xpcom(){
+ 
+                 _debug('this.user[update_url]', this.user['update_url']);
+ 
+-                if (['MAG200', 'MAG245','MAG245D', 'MAG250', 'MAG254', 'MAG255', 'MAG270', 'MAG275', 'WR320', 'IP_STB_HD'].indexOf(this.type) >= 0 || this.type.indexOf('AuraHD') != -1){
++                if (['MAG200', 'MAG245','MAG245D', 'MAG250', 'MAG254', 'MAG255', 'MAG270', 'MAG275', 'WR320', 'MAG322', 'MAG324', 'MAG420', 'IP_STB_HD'].indexOf(this.type) >= 0 || this.type.indexOf('AuraHD') != -1){
+                     this.check_image_version();
+                 }
+ 
+diff --git a/deploy/composer.json b/deploy/composer.json
+index c0de168..67944ef 100644
+--- a/deploy/composer.json
++++ b/deploy/composer.json
+@@ -28,7 +28,7 @@
+         "nymo/silex-twig-breadcrumb-extension":"~1.1",
+         "umpirsky/twig-gettext-extractor": "1.1.*",
+         "mtdowling/cron-expression": "1.0.*",
+-        "gemorroj/m3u-parser": "dev-master",
++        "gemorroj/m3u-parser": "2.0.0",
+         "codeguy/upload": ">=1"
+     },
+     "autoload": {
+diff --git a/external/settings/g_video.html b/external/settings/g_video.html
+index 3df16b6..9ec0f6f 100644
+--- a/external/settings/g_video.html
++++ b/external/settings/g_video.html
+@@ -23,6 +23,11 @@
+                 ['select', parent.t('HDMI event reaction:'), 0, parent.t("Ignore"), 1, parent.t("Immediately"), 60, parent.t("Delay 1 minute"), 300, parent.t("Delay 5 minute"), 600, parent.t("Delay 10 minutes")]
+             ];
+         }
++
++        if ('mag420' == model){
++            menuT[0] = ['select', parent.t('Video output mode:'), "Auto", "Auto", "PAL", "PAL", "576p-50", "576p-50", "720p-50", "720p-50", "1080i-50", "1080i-50", "1080p-50", "1080p-50", "NTSC", "NTSC", "720p-60", "720p-60", "1080i-60", "1080i-60", "1080p-60", "1080p-60", "3840x2160p25", "3840x2160p25", "3840x2160p30", "3840x2160p30", "3840x2160p50", "3840x2160p50", "3840x2160p60", "3840x2160p60"];
++        }
++
+         var mid = menuT.length + 2;
+         var pread = ["tvsystem", "graphicres", "auto_framerate", "force_dvi"];
+         var tread = '{"varList":["' + pread[0] + '"';
+diff --git a/server/administrator/events.php b/server/administrator/events.php
+index aa0dd06..26c2021 100644
+--- a/server/administrator/events.php
++++ b/server/administrator/events.php
+@@ -81,6 +81,12 @@ if (!empty($_POST['user_list_type']) && !empty($_POST['event'])){
+             $user_list = Middleware::getUidsByPattern(array('stb_type' => 'MAG275'));
+         }else if (@$_POST['pattern'] == 'wr320'){
+             $user_list = Middleware::getUidsByPattern(array('stb_type' => 'WR320'));
++        }else if (@$_POST['pattern'] == 'mag322'){
++            $user_list = Middleware::getUidsByPattern(array('stb_type' => 'MAG322'));
++        }else if (@$_POST['pattern'] == 'mag324'){
++            $user_list = Middleware::getUidsByPattern(array('stb_type' => 'MAG324'));
++        }else if (@$_POST['pattern'] == 'mag420'){
++            $user_list = Middleware::getUidsByPattern(array('stb_type' => 'MAG420'));
+         }else if (@$_POST['pattern'] == 'ip_stb_hd'){
+             $user_list = Middleware::getUidsByPattern(array('stb_type' => 'IP_STB_HD'));
+         }else if (@$_POST['pattern'] == 'aurahd0'){
+@@ -406,6 +412,9 @@ function fill_msg(){
+             <option value="mag270">MAG270</option>
+             <option value="mag275">MAG275</option>
+             <option value="wr320">WR320</option>
++            <option value="mag322">MAG322</option>
++            <option value="mag324">MAG324</option>
++            <option value="mag420">MAG420</option>
+             <option value="ip_stb_hd">IP_STB_HD</option>
+             <option value="aurahd0">AuraHD0</option>
+             <option value="aurahd1">AuraHD1</option>
+diff --git a/server/administrator/setting_common.php b/server/administrator/setting_common.php
+index 040b694..4873f01 100644
+--- a/server/administrator/setting_common.php
++++ b/server/administrator/setting_common.php
+@@ -151,6 +151,9 @@ h3{
+                             <option value="MAG270" {{if stb_type==="MAG270"}}selected{{/if}} >MAG270</option>
+                             <option value="MAG275" {{if stb_type==="MAG275"}}selected{{/if}} >MAG275</option>
+                             <option value="WR320" {{if stb_type==="WR320"}}selected{{/if}} >WR320</option>
++                            <option value="MAG322" {{if stb_type==="MAG322"}}selected{{/if}} >MAG322</option>
++                            <option value="MAG324" {{if stb_type==="MAG324"}}selected{{/if}} >MAG324</option>
++                            <option value="MAG420" {{if stb_type==="MAG420"}}selected{{/if}} >MAG420</option>
+                             <option value="IP_STB_HD" {{if stb_type==="IP_STB_HD"}}selected{{/if}} >IP_STB_HD</option>
+                             <option value="AuraHD0" {{if stb_type==="AuraHD0"}}selected{{/if}} >AuraHD0</option>
+                             <option value="AuraHD1" {{if stb_type==="AuraHD1"}}selected{{/if}} >AuraHD1</option>
+diff --git a/server/config.ini b/server/config.ini
+index 59f6f3f..28420e9 100644
+--- a/server/config.ini
++++ b/server/config.ini
+@@ -186,7 +186,7 @@ daemon_api_url = http://localhost:3000/
+ stalker_api_url = http://localhost/stalker_portal/api/
+ 
+ strict_stb_type_check = false
+-;allowed_stb_types = MAG200,MAG245,MAG245D,MAG250,MAG254,MAG255,MAG260,MAG270,MAG275,AuraHD,WR320
++allowed_stb_types = MAG200,MAG245,MAG245D,MAG250,MAG254,MAG255,MAG260,MAG270,MAG275,AuraHD,WR320,MAG322,MAG324,MAG420
+ 
+ ; Middleware server http proxy
+ ;http_proxy = tcp://10.128.1.1:8000
+@@ -371,7 +371,7 @@ record_max_length = 180
+ ; Per one user
+ total_records_length = 600
+ 
+-allowed_stb_types_for_local_recording = MAG245,MAG245D,MAG250,MAG254,MAG255,MAG270,MAG260,MAG275,AuraHD,WR320,IP_STB_HD
++allowed_stb_types_for_local_recording = MAG245,MAG245D,MAG250,MAG254,MAG255,MAG270,MAG260,MAG275,AuraHD,WR320,MAG322,MAG324,MAG420,IP_STB_HD
+ 
+ max_local_recordings = 10
+ 
+diff --git a/server/lib/stb.class.php b/server/lib/stb.class.php
+index f8fde87..1b85644 100644
+--- a/server/lib/stb.class.php
++++ b/server/lib/stb.class.php
+@@ -529,8 +529,11 @@ class Stb implements \Stalker\Lib\StbApi\Stb
+                 }
+             }
+         }
+-
+-        if ($model != 'MAG200' && $model != 'MAG260' && (empty($debug_key) || !$this->checkDebugKey($debug_key))){
++        $allowed_stb_types = Config::getSafe('allowed_stb_types', 'MAG200,MAG245,MAG245D,MAG250,MAG254,MAG255,MAG260,MAG270,MAG275,AuraHD,WR320,MAG322,MAG324,MAG420');
++        if (!empty($allowed_stb_types)) {
++            $allowed_stb_types = explode(',', $allowed_stb_types);
++        }
++        if (strtolower($client_type) == 'stb' && !in_array($model, $allowed_stb_types) && (empty($debug_key) || !$this->checkDebugKey($debug_key))) {
+ 
+             preg_match("/Player Engine version: (\S+)/", $version, $match);
+ 
+@@ -692,11 +695,11 @@ class Stb implements \Stalker\Lib\StbApi\Stb
+ 
+         $profile['allowed_stb_types']      = array_map(function($item){
+             return strtolower(trim($item));
+-        },explode(',', Config::getSafe('allowed_stb_types', 'MAG200,MAG245,MAG245D,MAG250,MAG254,MAG255,MAG260,MAG270,MAG275,AuraHD,WR320,IP_STB_HD')));
++        },explode(',', Config::getSafe('allowed_stb_types', 'MAG200,MAG245,MAG245D,MAG250,MAG254,MAG255,MAG260,MAG270,MAG275,AuraHD,WR320,MAG322,MAG324,MAG420,IP_STB_HD')));
+ 
+         $profile['allowed_stb_types_for_local_recording'] = array_map(function($item){
+             return strtolower(trim($item));
+-        },explode(',', Config::getSafe('allowed_stb_types_for_local_recording', 'MAG245,MAG245D,MAG250,MAG254,MAG255,MAG260,MAG270,MAG275,AuraHD,WR320,IP_STB_HD')));
++        },explode(',', Config::getSafe('allowed_stb_types_for_local_recording', 'MAG245,MAG245D,MAG250,MAG254,MAG255,MAG260,MAG270,MAG275,AuraHD,WR320,MAG322,MAG324,MAG420,IP_STB_HD')));
+ 
+         $auto_update_setting = ImageAutoUpdate::getSettingByStbType($this->params['stb_type']);
+ 
